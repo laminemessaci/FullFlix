@@ -22,11 +22,9 @@ export default class CastList extends Component {
   }
 
   async _loadCastLIst() {
-    await getCastList(this.state.id).then(resp => this.setState({cast: resp}));
-
-    this.setState({
-      isLoading: false,
-    });
+    await getCastList(this.state.id).then(resp =>
+      this.setState({cast: resp, isLoading: false}),
+    );
   }
   _displayLoading() {
     if (this.state.isLoading) {
@@ -70,6 +68,8 @@ export default class CastList extends Component {
 
   componentDidMount() {
     this._loadCastLIst();
+
+    this.setState({});
   }
 
   render() {
@@ -95,6 +95,7 @@ export default class CastList extends Component {
           keyExtractor={item => item.id.toString()}
           renderItem={this.renderItem}
         />
+        {this._displayLoading}
       </>
     );
   }
