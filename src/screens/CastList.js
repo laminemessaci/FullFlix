@@ -26,6 +26,7 @@ export default class CastList extends Component {
       this.setState({cast: resp, isLoading: false}),
     );
   }
+  //display loader
   _displayLoading() {
     if (this.state.isLoading) {
       return (
