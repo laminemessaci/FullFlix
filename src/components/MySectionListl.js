@@ -1,16 +1,40 @@
 import {useNavigation} from '@react-navigation/core';
 import React from 'react';
-import {View, Text, SectionList, Image, TouchableOpacity} from 'react-native';
+import {SectionList, TouchableOpacity, Image, View, Text} from 'react-native';
+
 import {getImageFilmFromApi} from '../api';
+import {MEDIA} from '../contatnts';
+
+import {connect} from 'react-redux';
 
 const MyCaroussel = ({films, ...props}) => {
   const navigation = useNavigation();
+  //console.log(films[0].data);
+
+  const displayFavoriteImage = () => {
+    let sourceImage = MEDIA.IMAGE_NO_FAV;
+    if (
+      props.favoritesFilm.findIndex(
+        item =>
+          item.id ===
+          films[0].data.map(item => {
+            console.log(item);
+            return item.id;
+          }),
+      ) !== -1
+    ) {
+      // movie in our favorites
+      sourceImage = MEDIA.IMAGE_FAV;
+    }
+    return <Image style={styles.favorite_image} source={sourceImage} />;
+  };
   const _renterItem = film => {
     const idFilm = film.item.id;
     return (
       <TouchableOpacity
         style={styles.content_container}
         onPress={() => navigation.navigate('FilmDetails', {idFilm})}>
+        {displayFavoriteImage()}
         <Image
           style={styles.image}
           source={{uri: getImageFilmFromApi(film.item.backdrop_path)}}
@@ -27,7 +51,7 @@ const MyCaroussel = ({films, ...props}) => {
   return (
     <SectionList
       sections={films}
-      renderSectionHeader={({section: {title}}) => (
+      rrenderSectionHeader={({section: {title}}) => (
         <Text style={styles.header}>{title}</Text>
       )}
       renderItem={_renterItem}
@@ -89,5 +113,18 @@ const styles = {
     textAlign: 'right',
     fontSize: 14,
   },
+  favorite_image: {
+    width: 20,
+    height: 20,
+    marginHorizontal: 15,
+  },
 };
-export default MyCaroussel;
+
+const mapStateToProps = state => {
+  console.log(state);
+  return {
+    favoritesFilm: state.favoritesFilm,
+  };
+};
+
+export default connect(mapStateToProps)(MyCaroussel);

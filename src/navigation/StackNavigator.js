@@ -3,9 +3,10 @@ import {View, Text} from 'react-native';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
-import DetailScreen from '../screens/DetailScreen';
+
 import {NavigationContainer} from '@react-navigation/native';
 import CastList from '../screens/CastList';
+import DetailScreen from '../screens/DetailScreen';
 
 const Stack = createNativeStackNavigator();
 

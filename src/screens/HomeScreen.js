@@ -14,9 +14,10 @@ import {getFilmDetailFromApi, getFilms, getImageFilmFromApi} from '../api';
 import CarousselItem from '../components/CarousselItem';
 import MySectionList from '../components/MySectionListl';
 import {MEDIA} from '../contatnts';
+import {connect} from 'react-redux';
 
 const {width, height} = Dimensions.get('window');
-export default function HomeScreen(props) {
+const HomeScreen = props => {
   //console.log('Device width: ' + width + '  Device height:  ' + height);
   const [movies, setMovies] = useState([]);
   const nativon = useNavigation();
@@ -94,7 +95,7 @@ export default function HomeScreen(props) {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = {
   container: {
@@ -149,3 +150,5 @@ const styles = {
     fontSize: 24,
   },
 };
+
+export default HomeScreen;

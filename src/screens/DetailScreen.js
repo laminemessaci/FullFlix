@@ -12,19 +12,22 @@ import {getFilmDetailFromApi, getImageFilmFromApi} from '../api';
 import moment from 'moment';
 import numeral from 'numeral';
 import AppButton from '../components/AppButton';
+import {connect} from 'react-redux';
+import {MEDIA} from '../contatnts';
 
-const DetailScreen = ({route, navigation}) => {
+const DetailScreen = ({route, navigation, ...props}) => {
+  console.log(props);
   const idFilm = route.params.idFilm;
   const nativon = useNavigation();
-  const [state, setState] = useState({
+  const [detailsState, setDetailsState] = useState({
     film: undefined,
     isLoading: true,
   });
 
-  const filmTitle = state.film ? state.film.title : 'title';
+  const filmTitle = detailsState.film ? detailsState.film.title : 'title';
   useEffect(() => {
     getFilmDetailFromApi(idFilm).then(data => {
-      setState({
+      setDetailsState({
         film: data,
         isLoading: false,
       });
@@ -40,9 +43,27 @@ const DetailScreen = ({route, navigation}) => {
   const handlClick = () => {
     navigation.navigate('CastList', {idFilm});
   };
+  const handlFavoritesClick = film => {
+    console.log('add to favorites!!');
+    const action = {type: 'ADD_FAVORITES', value: detailsState.film};
+    props.dispatch(action);
+  };
 
-  const _displayLoading = () => {
-    if (state.isLoading) {
+  const displayFavoriteImage = () => {
+    let sourceImage = MEDIA.IMAGE_NO_FAV;
+    if (
+      props.favoritesFilm.findIndex(
+        item => item.id === detailsState.film.id,
+      ) !== -1
+    ) {
+      // movie in our favorites
+      sourceImage = MEDIA.IMAGE_FAV;
+    }
+    return <Image style={styles.favorite_image} source={sourceImage} />;
+  };
+
+  const displayLoading = () => {
+    if (detailsState.isLoading) {
       return (
         <View style={styles.loading_container}>
           <ActivityIndicator size="large" />
@@ -51,15 +72,30 @@ const DetailScreen = ({route, navigation}) => {
     }
   };
 
-  const _displayFilm = () => {
-    //console.log(film);
-    if (state.film != undefined) {
+  const displayFilm = () => {
+    if (detailsState.film != undefined) {
       return (
         <ScrollView style={styles.scrollview_container}>
           <Image
             style={styles.image}
-            source={{uri: getImageFilmFromApi(state.film.backdrop_path)}}
+            source={{uri: getImageFilmFromApi(detailsState.film.backdrop_path)}}
           />
+          <View
+            style={{
+              marginHorizontal: 100,
+              marginVertical: 20,
+              flexDirection: 'row',
+              alignContent: 'center',
+              alignItems: 'center',
+            }}>
+            {displayFavoriteImage()}
+            <AppButton
+              title={'+ to Favorites'}
+              colors={['#060', '#0AE']}
+              onPress={handlFavoritesClick}
+            />
+          </View>
+
           <View
             style={{
               alignContent: 'center',
@@ -67,26 +103,34 @@ const DetailScreen = ({route, navigation}) => {
               flexDirection: 'row',
               margin: 5,
             }}>
-            <Text style={styles.title_text}>{state.film.title}</Text>
-            <AppButton title={'Cast'} onPress={handlClick} />
+            <Text style={styles.title_text}>{detailsState.film.title}</Text>
+            <AppButton
+              title={'Cast'}
+              colors={['#004d40', '#009688']}
+              onPress={handlClick}
+            />
           </View>
-          <Text style={styles.description_text}>{state.film.overview}</Text>
+          <Text style={styles.description_text}>
+            {detailsState.film.overview}
+          </Text>
           <Text style={styles.default_text}>
             Sorti le{' '}
-            {moment(new Date(state.film.release_date)).format('DD/MM/YYYY')}
+            {moment(new Date(detailsState.film.release_date)).format(
+              'DD/MM/YYYY',
+            )}
           </Text>
           <Text style={styles.default_text}>
-            Note : {state.film.vote_average} / 10
+            Note : {detailsState.film.vote_average} / 10
           </Text>
           <Text style={styles.default_text}>
-            Nombre de votes : {state.film.vote_count}
+            Nombre de votes : {detailsState.film.vote_count}
           </Text>
           <Text style={styles.default_text}>
-            Budget : {numeral(state.film.budget).format('0,0[.]00 $')}
+            Budget : {numeral(detailsState.film.budget).format('0,0[.]00 $')}
           </Text>
           <Text style={styles.default_text}>
             Genre(s) :{' '}
-            {state.film.genres
+            {detailsState.film.genres
               .map(function (genre) {
                 return genre.name;
               })
@@ -94,7 +138,7 @@ const DetailScreen = ({route, navigation}) => {
           </Text>
           <Text style={styles.default_text}>
             Companie(s) :{' '}
-            {state.film.production_companies
+            {detailsState.film.production_companies
               .map(function (company) {
                 return company.name;
               })
@@ -107,8 +151,8 @@ const DetailScreen = ({route, navigation}) => {
 
   return (
     <View style={styles.main_container}>
-      {_displayLoading()}
-      {_displayFilm()}
+      {displayLoading()}
+      {displayFilm()}
     </View>
   );
 };
@@ -160,6 +204,18 @@ const styles = {
     marginRight: 5,
     marginTop: 5,
   },
+
+  favorite_image: {
+    width: 20,
+    height: 20,
+    marginHorizontal: 15,
+  },
+};
+const mapStateToProps = state => {
+  return {
+    favoritesFilm: state.favoritesFilm,
+    isFavorite: state.isFavorite,
+  };
 };
 
-export default DetailScreen;
+export default connect(mapStateToProps)(DetailScreen);
