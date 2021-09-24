@@ -11,21 +11,19 @@ const MyCaroussel = ({films, ...props}) => {
   const navigation = useNavigation();
   //console.log(films[0].data);
 
-  const displayFavoriteImage = () => {
+  // const isFavorite = film.id => {
+  //   return films.includes(film);
+  // };
+
+  const displayFavoriteImage = film => {
     let sourceImage = MEDIA.IMAGE_NO_FAV;
-    if (
-      props.favoritesFilm.findIndex(
-        item =>
-          item.id ===
-          films[0].data.map(item => {
-            console.log(item);
-            return item.id;
-          }),
-      ) !== -1
-    ) {
-      // movie in our favorites
+    console.log(props.favoritesFilm.includes(film));
+    if (props.favoritesFilm.includes(film)) {
       sourceImage = MEDIA.IMAGE_FAV;
+    } else {
+      sourceImage = MEDIA.IMAGE_NO_FAV;
     }
+
     return <Image style={styles.favorite_image} source={sourceImage} />;
   };
   const _renterItem = film => {
@@ -34,7 +32,7 @@ const MyCaroussel = ({films, ...props}) => {
       <TouchableOpacity
         style={styles.content_container}
         onPress={() => navigation.navigate('FilmDetails', {idFilm})}>
-        {displayFavoriteImage()}
+        {displayFavoriteImage(film.item)}
         <Image
           style={styles.image}
           source={{uri: getImageFilmFromApi(film.item.backdrop_path)}}
@@ -121,7 +119,7 @@ const styles = {
 };
 
 const mapStateToProps = state => {
-  console.log(state);
+  //console.log(state);
   return {
     favoritesFilm: state.favoritesFilm,
   };
