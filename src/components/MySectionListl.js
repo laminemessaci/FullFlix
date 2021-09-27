@@ -9,18 +9,10 @@ import {connect} from 'react-redux';
 
 const MyCaroussel = ({films, ...props}) => {
   const navigation = useNavigation();
-  //console.log(films[0].data);
-
-  // const isFavorite = film.id => {
-  //   return films.includes(film);
-  // };
 
   const displayFavoriteImage = film => {
-    //console.log('state films ' + props.favoritesFilm.map(item => item.id));
-
-    //console.log('le film est :  ' + film.id);
     let sourceImage = MEDIA.IMAGE_NO_FAV;
-    //console.log(props.favoritesFilm.includes(film));
+
     if (props.favoritesFilm.map(item => item.id).includes(film.id)) {
       sourceImage = MEDIA.IMAGE_FAV;
     } else {
